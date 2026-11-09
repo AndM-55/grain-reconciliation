@@ -13,7 +13,7 @@
 * My first thought was to ensure that two unloads with the same ID have a consistent enough weight to one another. The threshold I chose was 50KG, so if the weight difference between the cloud and controller is greater than 50KG, I would flag this record as an inconsistency. I am NOT ACTUALLY sure if this is the appropriate amount to flag in the farming business, but this is what intuitively stood out to me.
 * I also decided to reject any unload records that were found in the controller source but not the cloud source. This is because I was treating the cloud as the master, which would decide whether a record is truly valid.
 * Incidentally, I allowed standalone cloud records with NO matching controller records to be persisted. Again, I am unsure if this is the standard for agricultural practices, but if you were to tell me that’s a no-go, I’m sure it would be trivial to change this logic to accommodate such.
-* I decided that as long as the unload ID matches from both sources, and the weight discrepancy is in an appropriate range, then this should be valid for a reconciliation, and I would not flag it as invalid. Perhaps this is too broad an assumption, but with the local nature of the controller clock, I decided this may be okay to leave for simplicity.
+* I decided that as long as the unload ID matches from both sources, and the weight discrepancy is in an appropriate range, then this should be valid for a reconciliation, and I would not flag it as invalid, even if the time stamps are a different. Perhaps this is too broad an assumption, but with the local nature of the controller clock, I decided this may be okay to leave for simplicity.
 
 ## Things in the brief or data that didn’t add up, and what I did
 
