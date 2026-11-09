@@ -1,0 +1,10 @@
+# Python / Pytest
+__pycache__/
+.pytest_cache/
+*.pyc
+
+# Local databases (don't commit your local runs)
+*.db
+
+# OS files
+.DS_Store

@@ -1,0 +1,501 @@
+[
+  {
+    "id": "8fdc7869-fa65-4c41-824b-481337e8c25c",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "oats",
+    "weight": 19422.6,
+    "unloaded_at": "2026-09-16 14:29:00",
+    "updated_at": "2026-09-16 14:29:05",
+    "unit": "kg"
+  },
+  {
+    "id": "040ef62f-cab7-4279-b317-8dbd18e12867",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "wheat",
+    "weight": 8875.0,
+    "unloaded_at": "2026-09-14 15:46:00",
+    "updated_at": "2026-09-14 15:46:05",
+    "unit": "kg"
+  },
+  {
+    "id": "0e4bd652-b32a-4309-b170-1b6a832e9dae",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "oats",
+    "weight": 13810.9,
+    "unloaded_at": "2026-09-15 11:43:00",
+    "updated_at": "2026-09-15 11:43:05",
+    "unit": "kg"
+  },
+  {
+    "id": "92734dab-5315-42f3-a93c-1db4d00c6ade",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "wheat",
+    "weight": 15750.9,
+    "unloaded_at": "2026-09-14 16:37:00",
+    "updated_at": "2026-09-14 16:37:05",
+    "unit": "kg"
+  },
+  {
+    "id": "1cc33abb-4461-474b-8090-14fed5baef95",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 10924.6,
+    "unloaded_at": "2026-09-15 14:38:00",
+    "updated_at": "2026-09-15 14:38:05",
+    "unit": "kg"
+  },
+  {
+    "id": "c7fa8cda-bad7-409a-80fa-7bf23b03a066",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "oats",
+    "weight": 16433.2,
+    "unloaded_at": "2026-09-14 13:07:00",
+    "updated_at": "2026-09-14 13:07:05",
+    "unit": "lb"
+  },
+  {
+    "id": "510fefb3-39ac-4377-940b-a9d7f9d77377",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 13307.2,
+    "unloaded_at": "2026-09-14 09:36:00",
+    "updated_at": "2026-09-14 09:36:05",
+    "unit": "kg"
+  },
+  {
+    "id": "965efcb5-30a3-406d-9468-ad583de39e84",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "soybeans",
+    "weight": 17583.3,
+    "unloaded_at": "2026-09-17 14:18:00",
+    "updated_at": "2026-09-17 14:18:05",
+    "unit": "kg"
+  },
+  {
+    "id": "361111e6-8ab4-466b-b91c-ea32e272f588",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "wheat",
+    "weight": 9279.4,
+    "unloaded_at": "2026-09-15 08:47:00",
+    "updated_at": "2026-09-15 08:47:08",
+    "unit": "kg"
+  },
+  {
+    "id": "93e3cbd6-4885-4ff1-8b38-93b76740d6ed",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "wheat",
+    "weight": 31067.5,
+    "unloaded_at": "2026-09-16 08:57:00",
+    "updated_at": "2026-09-16 08:57:05",
+    "unit": "lb"
+  },
+  {
+    "id": "b709ec96-7004-4cff-9bf3-5c399ccd709b",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "oats",
+    "weight": 8054.9,
+    "unloaded_at": "2026-09-16 12:31:00",
+    "updated_at": "2026-09-16 12:31:05",
+    "unit": "kg"
+  },
+  {
+    "id": "1dccaaf4-fe5d-486c-be70-e2e0050c7be1",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "wheat",
+    "weight": 9279.4,
+    "unloaded_at": "2026-09-15 08:47:00",
+    "updated_at": "2026-09-15 08:47:05",
+    "unit": "kg"
+  },
+  {
+    "id": "e799ad58-1942-4cb5-ad8f-805a212c0db7",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 18886.4,
+    "unloaded_at": "2026-09-15 08:12:00",
+    "updated_at": "2026-09-15 08:12:05",
+    "unit": "kg"
+  },
+  {
+    "id": "d4d3259d-e565-4a08-9ee2-8ba03bb77c22",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "soybeans",
+    "weight": 13182.2,
+    "unloaded_at": "2026-09-16 09:28:00",
+    "updated_at": "2026-09-16 09:28:05",
+    "unit": "kg"
+  },
+  {
+    "id": "2709e3ef-bf24-4824-b410-b87306164f4b",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "wheat",
+    "weight": 10273.3,
+    "unloaded_at": "2026-09-14 12:16:00",
+    "updated_at": "2026-09-14 12:16:05",
+    "unit": "kg"
+  },
+  {
+    "id": "c5e391e0-9b39-4282-90cf-70959add1dee",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "oats",
+    "weight": 8664.1,
+    "unloaded_at": "2026-09-15 13:42:00",
+    "updated_at": "2026-09-15 13:42:05",
+    "unit": "kg"
+  },
+  {
+    "id": "4f7a5149-97af-4b8f-8cca-49809ddaf212",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "wheat",
+    "weight": 20575.1,
+    "unloaded_at": "2026-09-14 14:23:00",
+    "updated_at": "2026-09-14 14:23:05",
+    "unit": "lb"
+  },
+  {
+    "id": "eb24ab27-cee9-4c46-b9f3-7f8f2baef162",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "oats",
+    "weight": 14299.8,
+    "unloaded_at": "2026-09-17 10:56:00",
+    "updated_at": "2026-09-17 10:56:05",
+    "unit": "kg"
+  },
+  {
+    "id": "03ac1d40-b0b4-454c-96dd-53c03654aae8",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 14063.9,
+    "unloaded_at": "2026-09-15 11:04:00",
+    "updated_at": "2026-09-15 13:34:00",
+    "unit": "kg"
+  },
+  {
+    "id": "f8996042-a2b3-4c02-b17f-b703ff3ed96b",
+    "field_id": "1682084f-1849-48df-bb8b-ebf1b3d4eced",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "oats",
+    "weight": 6835.4,
+    "unloaded_at": "2026-09-16 22:50:00",
+    "updated_at": "2026-09-16 22:50:05",
+    "unit": "kg"
+  },
+  {
+    "id": "d35e13a3-f646-4910-b30a-bf370fb959c4",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "soybeans",
+    "weight": 8140.3,
+    "unloaded_at": "2026-09-17 12:24:00",
+    "updated_at": "2026-09-17 13:34:00",
+    "unit": "kg"
+  },
+  {
+    "id": "ee536614-9918-47b3-b1c3-c3faf2fd74cb",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "oats",
+    "weight": 9502.2,
+    "unloaded_at": "2026-09-17 12:55:00",
+    "updated_at": "2026-09-17 12:55:05",
+    "unit": "kg"
+  },
+  {
+    "id": "fe126378-2bae-4a71-ae8a-dfafab4e564d",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 12969.4,
+    "unloaded_at": "2026-09-16 15:05:00",
+    "updated_at": "2026-09-16 17:35:00",
+    "unit": "kg"
+  },
+  {
+    "id": "2f5e7232-7a60-4323-b436-78590a7303a8",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "wheat",
+    "weight": 8395.3,
+    "unloaded_at": "2026-09-14 10:07:00",
+    "updated_at": "2026-09-14 12:37:00",
+    "unit": "kg"
+  },
+  {
+    "id": "4d1ad335-8dfa-4ce2-b617-f17c02844e97",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "soybeans",
+    "weight": 8930.3,
+    "unloaded_at": "2026-09-17 10:23:00",
+    "updated_at": "2026-09-17 10:23:05",
+    "unit": "kg"
+  },
+  {
+    "id": "97fd5b3d-a43b-48c3-83fd-5c284027e29a",
+    "field_id": "3ba58780-8f4c-45fd-a194-7346e37d787b",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "soybeans",
+    "weight": 11309.9,
+    "unloaded_at": "2026-09-17 13:55:00",
+    "updated_at": "2026-09-17 13:55:05",
+    "unit": "kg"
+  },
+  {
+    "id": "97e39a71-37c6-4f6d-ac7b-428eebeb34fc",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "soybeans",
+    "weight": 8841.0,
+    "unloaded_at": "2026-09-16 15:58:00",
+    "updated_at": "2026-09-16 15:58:05",
+    "unit": "kg"
+  },
+  {
+    "id": "14c62770-9ab8-4619-b0df-ed4dd4b62afb",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "oats",
+    "weight": 9093.3,
+    "unloaded_at": "2026-09-14 11:01:00",
+    "updated_at": "2026-09-14 11:01:05",
+    "unit": "kg"
+  },
+  {
+    "id": "cc9a09e7-5db4-4638-914d-5cb0ab6c78a4",
+    "field_id": "3ba58780-8f4c-45fd-a194-7346e37d787b",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "soybeans",
+    "weight": 8007.3,
+    "unloaded_at": "2026-09-17 11:41:00",
+    "updated_at": "2026-09-17 11:41:05",
+    "unit": "kg"
+  },
+  {
+    "id": "67c5558c-2064-4937-bd12-0c4b4ad991ff",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 22669.4,
+    "unloaded_at": "2026-09-14 08:02:00",
+    "updated_at": "2026-09-14 08:02:05",
+    "unit": "lb"
+  },
+  {
+    "id": "2461452e-8dce-42c8-b5ce-4e99abfb0289",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "wheat",
+    "weight": 16330.5,
+    "unloaded_at": "2026-09-15 15:02:00",
+    "updated_at": "2026-09-15 15:02:05",
+    "unit": "kg"
+  },
+  {
+    "id": "0135ccd0-9a09-40c8-bf3a-719017b03a5d",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "oats",
+    "weight": 8755.7,
+    "unloaded_at": "2026-09-15 09:26:00",
+    "updated_at": "2026-09-15 09:26:05",
+    "unit": "kg"
+  },
+  {
+    "id": "a4d0e065-1b46-4fd1-b049-ac59b2c6d968",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "oats",
+    "weight": 15017.0,
+    "unloaded_at": "2026-09-16 10:17:00",
+    "updated_at": "2026-09-16 10:17:05",
+    "unit": "kg"
+  },
+  {
+    "id": "5e020d42-40a7-45c9-ad32-b19986692c2c",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "oats",
+    "weight": 14836.6,
+    "unloaded_at": "2026-09-14 15:07:00",
+    "updated_at": "2026-09-14 15:07:05",
+    "unit": "kg"
+  },
+  {
+    "id": "e0c919ba-7332-4d0c-99c8-bc36c60f7a93",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 11113.6,
+    "unloaded_at": "2026-09-16 12:59:00",
+    "updated_at": "2026-09-16 12:59:05",
+    "unit": "kg"
+  },
+  {
+    "id": "e0747dc3-ee3b-47b6-9b67-4430793c4022",
+    "field_id": "1682084f-1849-48df-bb8b-ebf1b3d4eced",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "oats",
+    "weight": 6020.0,
+    "unloaded_at": "2026-09-16 22:00:00",
+    "updated_at": "2026-09-16 22:00:05",
+    "unit": "kg"
+  },
+  {
+    "id": "48cbadea-2800-4298-9d62-4cbfa5620674",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 34887.9,
+    "unloaded_at": "2026-09-15 13:01:00",
+    "updated_at": "2026-09-15 13:01:05",
+    "unit": "lb"
+  },
+  {
+    "id": "d5a64f66-f618-4954-aa89-dde004c9db49",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "oats",
+    "weight": 9834.8,
+    "unloaded_at": "2026-09-16 16:25:00",
+    "updated_at": "2026-09-16 16:25:05",
+    "unit": "kg"
+  },
+  {
+    "id": "29510e82-864a-43fd-a71e-8655ea0b14f7",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "soybeans",
+    "weight": 8135.3,
+    "unloaded_at": "2026-09-17 08:03:00",
+    "updated_at": "2026-09-17 08:03:05",
+    "unit": "kg"
+  },
+  {
+    "id": "dbaf01f3-2d06-464e-b5ba-6b497743a3c7",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "oats",
+    "weight": 14117.0,
+    "unloaded_at": "2026-09-16 08:09:00",
+    "updated_at": "2026-09-16 08:09:05",
+    "unit": "kg"
+  },
+  {
+    "id": "be36c7ad-d745-4624-a054-2a44fc0da3cd",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 8913.7,
+    "unloaded_at": "2026-09-15 12:29:00",
+    "updated_at": "2026-09-15 12:29:05",
+    "unit": "kg"
+  },
+  {
+    "id": "671d5216-7302-404c-904c-3694efa16b17",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 14523.7,
+    "unloaded_at": "2026-09-15 16:26:00",
+    "updated_at": "2026-09-15 16:26:05",
+    "unit": "kg"
+  },
+  {
+    "id": "fb30468f-2a1d-41ee-9b91-97c252335519",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "crop": "wheat",
+    "weight": 8672.6,
+    "unloaded_at": "2026-09-14 11:32:00",
+    "updated_at": "2026-09-14 11:32:05",
+    "unit": "kg"
+  },
+  {
+    "id": "b445a8a9-1143-4243-acba-4547fdeff87d",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "oats",
+    "weight": 31345.7,
+    "unloaded_at": "2026-09-17 08:49:00",
+    "updated_at": "2026-09-17 08:49:05"
+  },
+  {
+    "id": "c48fb5eb-d1b4-48dc-8111-67b232e99d06",
+    "field_id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 8789.2,
+    "unloaded_at": "2026-09-14 13:37:00",
+    "updated_at": "2026-09-14 13:37:05",
+    "unit": "kg"
+  },
+  {
+    "id": "aa6d4c3a-ab41-4a57-b955-33a89b42899a",
+    "field_id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "truck_id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "crop": "soybeans",
+    "weight": 19445.1,
+    "unloaded_at": "2026-09-16 11:30:00",
+    "updated_at": "2026-09-16 14:00:00",
+    "unit": "kg"
+  },
+  {
+    "id": "4b3b9c14-130a-4ecd-a6a5-8e30b5292474",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "oats",
+    "weight": 13534.3,
+    "unloaded_at": "2026-09-14 09:00:00",
+    "updated_at": "2026-09-14 09:00:05",
+    "unit": "kg"
+  },
+  {
+    "id": "be30f7ba-41b7-4302-8118-fc69ba80987a",
+    "field_id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "oats",
+    "weight": 15612.2,
+    "unloaded_at": "2026-09-15 15:59:00",
+    "updated_at": "2026-09-15 15:59:05",
+    "unit": "kg"
+  },
+  {
+    "id": "3ac2ff60-5686-4564-a28c-dd2d1d59d793",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "crop": "wheat",
+    "weight": 10924.6,
+    "unloaded_at": "2026-09-15 14:38:00",
+    "updated_at": "2026-09-15 14:38:08",
+    "unit": "kg"
+  },
+  {
+    "id": "15fd42ce-d83b-40f6-9cf1-7f20265aceea",
+    "field_id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "truck_id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "crop": "wheat",
+    "weight": 16649.5,
+    "unloaded_at": "2026-09-16 11:07:00",
+    "updated_at": "2026-09-16 11:07:05",
+    "unit": "kg"
+  }
+]

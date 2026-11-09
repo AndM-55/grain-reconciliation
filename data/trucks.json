@@ -1,0 +1,22 @@
+[
+  {
+    "id": "154b7a42-20b5-4d23-8a24-54dfbc579609",
+    "name": "Kenworth tandem",
+    "capacity_kg": 18000
+  },
+  {
+    "id": "46bfe462-d9fc-4328-97c4-3328e0974de2",
+    "name": "Super B",
+    "capacity_kg": 41000
+  },
+  {
+    "id": "a7329fec-b55d-4b0c-933d-045298498e7c",
+    "name": "Blue Freightliner",
+    "capacity_kg": 20000
+  },
+  {
+    "id": "4a861507-1003-4528-9ea6-9f9b7370ae32",
+    "name": "Farm truck",
+    "capacity_kg": 9000
+  }
+]

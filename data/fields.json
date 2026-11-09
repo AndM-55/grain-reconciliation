@@ -1,0 +1,50 @@
+[
+  {
+    "id": "0ce98e8d-ca00-4ab0-8205-cd156818f096",
+    "name": "Home Quarter",
+    "area_ha": 64.7,
+    "crop": "canola"
+  },
+  {
+    "id": "8fd7fa69-0b0b-4cf8-b897-127c005d3def",
+    "name": "North of Creek",
+    "area_ha": 51.2,
+    "crop": "canola"
+  },
+  {
+    "id": "ab3654b5-87f6-47f7-82b0-b3c2d11d625e",
+    "name": "Schmidt Rental",
+    "area_ha": 129.5,
+    "crop": "wheat"
+  },
+  {
+    "id": "64d1fc80-38fa-4c1e-b13e-b833119151cb",
+    "name": "Highway Piece",
+    "area_ha": 32.4,
+    "crop": "wheat"
+  },
+  {
+    "id": "8e69b948-3adc-4689-abb9-3ad60cdb9329",
+    "name": "Gravel Pit East",
+    "area_ha": 78.9,
+    "crop": "soybeans"
+  },
+  {
+    "id": "3ba58780-8f4c-45fd-a194-7346e37d787b",
+    "name": "Old Yard",
+    "area_ha": 40.1,
+    "crop": "soybeans"
+  },
+  {
+    "id": "e7beceaa-8bf0-47ab-9b78-edcb131e2575",
+    "name": "Dyck Half",
+    "area_ha": 258.0,
+    "crop": "wheat"
+  },
+  {
+    "id": "1d573d09-6ffc-401a-90d6-c424a7e95989",
+    "name": "Slough Quarter",
+    "area_ha": 60.3,
+    "crop": "oats"
+  }
+]
