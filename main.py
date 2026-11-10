@@ -194,6 +194,7 @@ def process_unloads():
             )
 
     conn.commit()
+    conn.close()
 
 
 
@@ -264,5 +265,5 @@ if __name__ == "__main__":
     if len(sys.argv) > 1 and sys.argv[1] == "report":
         print_reconciliation_report()
     else:
-        # Default behavior: run pipeline, then display the report
+        # Default behavior: run pipeline
         main()

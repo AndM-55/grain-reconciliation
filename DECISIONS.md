@@ -6,13 +6,16 @@
 
 ## Choices I made (and what I rejected)
 
-* chose to go with python and sqlite3 to keep things simple, as this seemed appropriate for the scope of the activity, as opposed to a heavier RDBMS.
+* I chose to go with python and sqlite3 to keep things simple, as this seemed appropriate for the scope of the activity, as opposed to a heavier RDBMS. I was also drawn to python because it's quite easy to process JSON
 
 * I decided not to drop the entire database schema every time the container started up, but rather I just deleted from the tables during runtime to get around duplicate insertions.
 
 * My first thought was to ensure that two unloads with the same ID have a consistent enough weight to one another. The threshold I chose was 50KG, so if the weight difference between the cloud and controller is greater than 50KG, I would flag this record as an inconsistency. I am NOT ACTUALLY sure if this is the appropriate amount to flag in the farming business, but this is what intuitively stood out to me.
+
 * I also decided to reject any unload records that were found in the controller source but not the cloud source. This is because I was treating the cloud as the master, which would decide whether a record is truly valid.
-* Incidentally, I allowed standalone cloud records with NO matching controller records to be persisted. Again, I am unsure if this is the standard for agricultural practices, but if you were to tell me that’s a no-go, I’m sure it would be trivial to change this logic to accommodate such.
+
+* Incidentally, I allowed standalone cloud records with NO matching controller records to be validated and reconciled. Again, I am unsure if this is the standard for agricultural practices, but if you were to tell me that’s a no-go, I’m sure it would be trivial to change this logic to accommodate such.
+
 * I decided that as long as the unload ID matches from both sources, and the weight discrepancy is in an appropriate range, then this should be valid for a reconciliation, and I would not flag it as invalid, even if the time stamps are a different. Perhaps this is too broad an assumption, but with the local nature of the controller clock, I decided this may be okay to leave for simplicity.
 
 ## Things in the brief or data that didn’t add up, and what I did
@@ -31,6 +34,18 @@
 * I used Google Gemini to assist me in this exercise. I intended to reach an end product where I could clearly display my decision-making around the actual task, rather than getting caught up in the details of tools and syntax I haven’t extensively used before.
 * Some instances where Gemini let me down is when it would suggest an implimentation that was not consistent with the activity description. For example, it would suggest many intricate details about unit conversion, etc., without considering the description of the activity. It would also frequently forget that I wanted to run this project with docker and persistently suggest dependency installations, as well as forget my schema design.
 * Other than that, it was quite helpful for scoping out this problem and deciding on the tech stack, and it was certainly helpful for suggesting how to best utilize Python from a syntax standpoint.
+
+## tests
+
+* For test 1 I chose to test the sanitization of the controller records, ensuring that the function adequately and accurately formatted the record similarly to the cloud record. I chose this one becasue I wanted to be certain that the data from the controller could be reliably fitted to the same schema as the cloud records so that comparisons would be easier.
+* for test 2 I chose to test that records found from both sources that had too great of a weight difference were flagged and put into the unresolved_unloads table. I think this was an important test because this decision was nested deep in the logic of this pipeline, and successfully verifying this made me much more confident that my solution was behaving as intended. It was also a good exercise for me to unit test with a mock database, because this type of testing is more challenging but crucially important for ensuring records agree with one another.
+* Another test I would like to implement with more time would be to test that controller records with no matching cloud record are correctly placed in the unresolved table
+
+## With another day I would
+
+* take a closer look at the time stamps of these records and implement more logic for flagging unresolved unloads.
+* In general, I would have liked to look into common practices and standards for agricultural operations in the context of data reconciliation. I would have liked to be very confident in saying that X amount of weight discrepancy is the hard limit, or perhaps to know whether time stamp differences must be contended with.
+* Naturally, I would have liked to rely on AI less for this, and weigh more delicately what would be the ideal tech stack to use for this problem. Perhaps I would have even bene interested in learning some Laravel.
 
 ## other tools
 

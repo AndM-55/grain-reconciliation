@@ -116,4 +116,3 @@ def test_weight_discrepancy_routing(test_db, monkeypatch):
     assert "Weight discrepancy exceeds tolerance" in row["reason"]
     assert row["source"] == "cloud"
 
-"""Another test I would like to implement with more time would be to test that controller recordds with no matching cloud record are correctly placed in the unresolved table"""
