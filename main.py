@@ -1,6 +1,7 @@
 import json
 import sqlite3
 from pathlib import Path
+from datetime import datetime
 
 DB_PATH = Path("reconciliation.db")
 SCHEMA_PATH = Path("schema.sql")
@@ -18,8 +19,11 @@ def print_reconciliation_report():
     print(" GRAIN CART RECONCILIATION REPORT")
     print("=" * 80)
 
+    cursor.execute("SELECT COUNT(*) FROM reconciled_unloads")
+    resolved_count = cursor.fetchone()[0]
+
     # --- PART 1: Field-by-Field Breakdown ---
-    print("\n[1] RECONCILED UNLOADS BY FIELD")
+    print(f"\n[1] RECONCILED UNLOADS BY FIELD ({resolved_count} total records)")
     print(f"{'Field ID':<38} | {'Crop':<10} | {'Unloads':<8} | {'Total Weight (kg)':<18}")
     print("-" * 80)
 
@@ -90,8 +94,8 @@ def normalize_controller_record(raw, active_cloud_data):
         "truck_id": raw["truck_id"],
         "crop": raw["crop"],
         "weight_kg": weight_in_kg,  
-        "unloaded_at": raw["unloaded_at"].replace(" ", "T") + "-05:00",
-        "updated_at": raw["updated_at"].replace(" ", "T") + "-05:00"
+        "unloaded_at": raw["unloaded_at"].replace(" ", "T") + "-06:00",
+        "updated_at": raw["updated_at"].replace(" ", "T") + "-06:00"
     }
 
 ###################################################################
@@ -143,9 +147,12 @@ def process_unloads():
         if controller_record:
             matched_controller_ids.add(record_id)
 
+            cloud_dt = datetime.fromisoformat(cloud_record["updated_at"])
+            controller_dt = datetime.fromisoformat(controller_record["updated_at"])
+
             winning_record = (
                 cloud_record 
-                if cloud_record["updated_at"] >= controller_record["updated_at"] 
+                if cloud_dt >= controller_dt
                 else controller_record
             )
             
