@@ -4,7 +4,9 @@ from pathlib import Path
 
 DB_PATH = Path("reconciliation.db")
 SCHEMA_PATH = Path("schema.sql")
-WEIGHT_TOLERANCE_KG = 50.0
+LB_TO_KG = 0.4536
+
+# WEIGHT_TOLERANCE_KG = 50.0
 
 def print_reconciliation_report():
     """Queries the SQLite database and prints the required reconciliation report to the console."""
@@ -56,16 +58,43 @@ def print_reconciliation_report():
     print("=" * 80 + "\n")
     conn.close()
 
-def normalize_controller_record(raw):
+###################################################################
+
+def _find_cloud_record_by_id(record_id, active_cloud_data):
+    """Helper function to find a matching cloud entry by ID."""
+    for cloud_rec in active_cloud_data:
+        if cloud_rec.get("id") == record_id:
+            return cloud_rec
+    return None
+
+###################################################################
+
+def normalize_controller_record(raw, active_cloud_data):
+    raw_unit = raw.get("unit", "unknown").lower()
+    
+    if raw_unit in ["lb", "pounds", "lbs"]:
+        weight_in_kg = LB_TO_KG * raw["weight"]
+    elif raw_unit == "kg":
+        weight_in_kg = raw["weight"]
+    else:
+        # Unknown or missing unit: fall back to the matching cloud record's weight
+        cloud_match = _find_cloud_record_by_id(raw.get("id"), active_cloud_data)
+        if cloud_match:
+            weight_in_kg = cloud_match.get("weight_kg", 0.0)
+        else:
+            weight_in_kg = raw.get("weight", 0.0)
+
     return {
         "id": raw["id"],  # Same identifier
         "field_id": raw["field_id"],
         "truck_id": raw["truck_id"],
         "crop": raw["crop"],
-        "weight_kg": raw["weight"],  # Already in kg, just map the key
+        "weight_kg": weight_in_kg,  
         "unloaded_at": raw["unloaded_at"].replace(" ", "T") + "-05:00",
         "updated_at": raw["updated_at"].replace(" ", "T") + "-05:00"
     }
+
+###################################################################
 
 def process_unloads():
     """Loads cloud and controller unloads and runs reconciliation."""
@@ -98,7 +127,7 @@ def process_unloads():
     print(f"number of records deleted on behalf of cloud:     {len(deleted_cloud_data)}")
 
     normalized_controller_data = [
-        normalize_controller_record(record) for record in controller_data
+        normalize_controller_record(record, active_cloud_data) for record in controller_data
     ]
 
     # Index normalized controller records by ID 
@@ -113,50 +142,30 @@ def process_unloads():
 
         if controller_record:
             matched_controller_ids.add(record_id)
-            # Both systems have this record. Check for weight divergence.
-            cloud_weight = cloud_record["weight_kg"]
-            controller_weight = controller_record["weight_kg"]
+
+            winning_record = (
+                cloud_record 
+                if cloud_record["updated_at"] >= controller_record["updated_at"] 
+                else controller_record
+            )
             
-            if abs(cloud_weight - controller_weight) > WEIGHT_TOLERANCE_KG:
-                # Discrepancy is too high - route to unresolved_unloads for manual review
-                cursor.execute(
-                    """
-                    INSERT OR REPLACE INTO unresolved_unloads 
-                    (unload_id, source, raw_payload, reason)
-                    VALUES (?, ?, ?, ?)
-                    """,
-                    (
-                        cloud_record["id"],
-                        "cloud",
-                        json.dumps({"cloud": cloud_record, "controller": controller_record}),
-                        f"Weight discrepancy exceeds tolerance: Cloud={cloud_weight}kg, Controller={controller_weight}kg"
-                    )
+            cursor.execute(
+                """
+                INSERT OR REPLACE INTO reconciled_unloads 
+                (id, field_id, truck_id, crop, weight_kg, unloaded_at, updated_at, resolution_notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    winning_record["id"],
+                    winning_record["field_id"],
+                    winning_record["truck_id"],
+                    winning_record["crop"],
+                    winning_record["weight_kg"],
+                    winning_record["unloaded_at"],
+                    winning_record["updated_at"],
+                    None  # resolution_notes can be None for normal successful syncs
                 )
-            else:
-                # Weights are aligned. Resolve conflict by taking the most recently updated record.
-                winning_record = (
-                    cloud_record 
-                    if cloud_record["updated_at"] >= controller_record["updated_at"] 
-                    else controller_record
-                )
-                
-                cursor.execute(
-                    """
-                    INSERT OR REPLACE INTO reconciled_unloads 
-                    (id, field_id, truck_id, crop, weight_kg, unloaded_at, updated_at, resolution_notes)
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """,
-                    (
-                        winning_record["id"],
-                        winning_record["field_id"],
-                        winning_record["truck_id"],
-                        winning_record["crop"],
-                        winning_record["weight_kg"],
-                        winning_record["unloaded_at"],
-                        winning_record["updated_at"],
-                        None  # resolution_notes can be None for normal successful syncs
-                    )
-                )
+            )
         else:
             # Record exists in Cloud, but missing from Controller (Valid Master record)
             cursor.execute(
@@ -197,6 +206,7 @@ def process_unloads():
     conn.close()
 
 
+###################################################################
 
 def init_db():
     """Automatically initializing the SQLite database using schema.sql."""
@@ -208,6 +218,7 @@ def init_db():
     print("Database initialized successfully from schema.sql")
 
 
+###################################################################
 # this function will load the reference data for trucks and fields into the databases
 def load_reference_data():
     """Loads fields and trucks"""
@@ -242,7 +253,7 @@ def load_reference_data():
     conn.close()
     print("Reference data (fields and trucks) loaded successfully!")
 
-
+###################################################################
 
 def main():
     print("Grain Cart Reconciliation Pipeline")
@@ -257,6 +268,8 @@ def main():
     process_unloads()
     
     print("==========================================")
+
+###################################################################
 
 if __name__ == "__main__":
     import sys

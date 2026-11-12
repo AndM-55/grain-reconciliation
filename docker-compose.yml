@@ -4,7 +4,4 @@ services:
     build: .
     volumes:
       - .:/app
-    ports:
-      - "8000:8000"
-    # Allow python arguments to pass through from docker run commands
     command: ["python", "main.py"]

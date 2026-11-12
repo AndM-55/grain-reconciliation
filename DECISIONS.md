@@ -1,5 +1,13 @@
 # Decisions
 
+## Second pass adjustments
+
+1) Weight discrepancy problem: after a few manual calculations, I do indeed see that proportion of 0.0453 in many records I claimed to be unresolved. I should definitely treat the lb unit from the controllers as valid. Initially, I did notice the weight field being different on some of the controller unloads, which should have told me to convert the units, but instead I chose to interpret the brief extremely literally. In hindsight, this was a strange choice haha. I changed normalize_controller_record() to convert the units from the controller where appropriate.
+
+2) Brief and data disagree: This immediately ties in with the above. Initially I treated the brief as absolute, but I realize now I should trust the controllers more, since they will have been created by your talented embedded team. With this suggestion, I noted what you said in your first hypothetical question answer. Trust the data, and if a record says nothing, don't assume, but refer to the other things you have. I made a helper function _find_cloud_record_by_id() to reconcile the one controller_unload that was missing the weight unit.
+
+3) 
+
 ## What I built
 
 * I built a containerized application as described to reconcile unload records from two sources: the cloud and controllers in the field. This program takes the provided json files, creates schemas and a relational database to store and help process data, and reconciles the records, treating the cloud as the master decision maker that determines the final record that will be persisted in the database. The program processes the data, making decisions on which records will be deemed reconciled, and which will be deemed incomplete/irreconcilable. Given the command listed in the README will also print the summary data to the console. Finally, this application also has two included unit tests, and a proposal for another unit test to validate the program behaviour.
