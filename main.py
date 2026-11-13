@@ -1,11 +1,16 @@
 import json
 import sqlite3
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone
 
 DB_PATH = Path("reconciliation.db")
 SCHEMA_PATH = Path("schema.sql")
 LB_TO_KG = 0.4536
+truck_ids = set()
+field_ids = set()
+
+# unload_id 1dccaaf4-fe5d-486c-be70-e2e0050c7be1 and 361111e6-8ab4-466b-b91c-ea32e272f588 are tricky here
+# maybe even add 3ac2ff60-5686-4564-a28c-dd2d1d59d793 to the list?
 
 # WEIGHT_TOLERANCE_KG = 50.0
 
@@ -73,20 +78,45 @@ def _find_cloud_record_by_id(record_id, active_cloud_data):
 
 ###################################################################
 
-def normalize_controller_record(raw, active_cloud_data):
-    raw_unit = raw.get("unit", "unknown").lower()
+def standardize_timestamp(ts_str):
+    if not ts_str:
+        return None
     
-    if raw_unit in ["lb", "pounds", "lbs"]:
-        weight_in_kg = LB_TO_KG * raw["weight"]
-    elif raw_unit == "kg":
-        weight_in_kg = raw["weight"]
-    else:
-        # Unknown or missing unit: fall back to the matching cloud record's weight
-        cloud_match = _find_cloud_record_by_id(raw.get("id"), active_cloud_data)
-        if cloud_match:
-            weight_in_kg = cloud_match.get("weight_kg", 0.0)
+    # 1. Ensure 'T' separates date and time (handles spaces if present)
+    clean_str = ts_str.replace(" ", "T")
+    
+    # 2. Parse into a timezone-aware datetime object
+    dt = datetime.fromisoformat(clean_str)
+    
+    # 3. Convert to UTC so every timestamp shares the exact same anchor
+    dt_utc = dt.astimezone(timezone.utc)
+    
+    # 4. Return as a standard ISO string (e.g., '2026-09-15T19:04:00+00:00')
+    return dt_utc.isoformat()
+
+###################################################################
+
+def normalize_record(raw, active_cloud_data, rec_type):
+    if rec_type == "controller":
+        raw_unit = raw.get("unit", "unknown").lower()
+        
+        if raw_unit in ["lb", "pounds", "lbs"]:
+            weight_in_kg = LB_TO_KG * raw["weight"]
+        elif raw_unit == "kg":
+            weight_in_kg = raw["weight"]
         else:
-            weight_in_kg = raw.get("weight", 0.0)
+            # Unknown or missing unit: fall back to the matching cloud record's weight
+            cloud_match = _find_cloud_record_by_id(raw.get("id"), active_cloud_data)
+            if cloud_match:
+                weight_in_kg = cloud_match.get("weight_kg", 0.0)
+            else:
+                weight_in_kg = raw.get("weight", 0.0)
+        unloaded_at = standardize_timestamp(raw["unloaded_at"].replace(" ", "T") + "-06:00")
+        updated_at = standardize_timestamp(raw["updated_at"].replace(" ", "T") + "-06:00") 
+    else: 
+        weight_in_kg = raw.get("weight_kg")
+        unloaded_at = standardize_timestamp(raw["unloaded_at"])
+        updated_at = standardize_timestamp(raw["updated_at"]) 
 
     return {
         "id": raw["id"],  # Same identifier
@@ -94,9 +124,82 @@ def normalize_controller_record(raw, active_cloud_data):
         "truck_id": raw["truck_id"],
         "crop": raw["crop"],
         "weight_kg": weight_in_kg,  
-        "unloaded_at": raw["unloaded_at"].replace(" ", "T") + "-06:00",
-        "updated_at": raw["updated_at"].replace(" ", "T") + "-06:00"
+        "unloaded_at": unloaded_at,
+        "updated_at": updated_at
     }
+
+###################################################################
+
+def store_reconciled_record(cursor: sqlite3.Cursor, record):
+    cursor.execute(
+        """
+                INSERT OR REPLACE INTO reconciled_unloads 
+                (id, field_id, truck_id, crop, weight_kg, unloaded_at, updated_at, resolution_notes)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+        (
+            record["id"],
+            record["field_id"],
+            record["truck_id"],
+            record["crop"],
+            record["weight_kg"],
+            record["unloaded_at"],
+            record["updated_at"],
+            None  # resolution_notes can be None for normal successful syncs
+        )
+    )
+###################################################################
+
+def store_dropped_record(cursor: sqlite3.Cursor, record, reason):
+    cursor.execute(
+        """
+                INSERT OR REPLACE INTO unresolved_unloads 
+                (unload_id, source, raw_payload, reason)
+                VALUES (?, ?, ?, ?)
+                """,
+        (
+            record["id"],
+            "controller",
+            json.dumps(record),
+            reason
+        )
+    )
+    
+
+###################################################################
+
+def check_discrepancies(cursor: sqlite3.Cursor, controller_record):
+    if controller_record["field_id"] not in field_ids:
+        store_dropped_record(cursor, controller_record, "Field ID discrepancy")
+        return False
+    elif controller_record["truck_id"] not in truck_ids:
+        store_dropped_record(cursor, controller_record, "Truck ID discrepancy")
+        return False
+    else:
+        # Query the database to check if a reconciled unload with the exact 
+        # same field, truck, and timestamp already exists.
+        # (Make sure 'reconciled_unloads' matches your actual table name)
+        cursor.execute(
+            """
+            SELECT 1 FROM reconciled_unloads 
+            WHERE field_id = ? 
+              AND truck_id = ? 
+              AND unloaded_at = ?
+            """,
+            (
+                controller_record["field_id"],
+                controller_record["truck_id"],
+                controller_record["unloaded_at"]
+            )
+        )
+        existing_match = cursor.fetchone()
+        
+        if existing_match:
+            store_dropped_record(cursor, controller_record, "Duplicate unload discrepancy")
+            return False
+            
+    return True
+
 
 ###################################################################
 
@@ -124,6 +227,11 @@ def process_unloads():
         if record.get("trashed_at") is None
     ]
 
+    trashed_cloud_record_ids = [
+        record["id"] for record in cloud_data
+        if record.get("trashed_at") is not None
+    ]
+
     deleted_cloud_data = [
         record for record in cloud_data
         if record.get("trashed_at") is not None
@@ -131,12 +239,11 @@ def process_unloads():
     print(f"number of records deleted on behalf of cloud:     {len(deleted_cloud_data)}")
 
     normalized_controller_data = [
-        normalize_controller_record(record, active_cloud_data) for record in controller_data
+        normalize_record(record, active_cloud_data, "controller") for record in controller_data
     ]
 
     # Index normalized controller records by ID 
     controller_dictionary = {record["id"]: record for record in normalized_controller_data}
-
     matched_controller_ids = set()
 
     # Iterate through active cloud records to match and reconcile
@@ -146,68 +253,28 @@ def process_unloads():
 
         if controller_record:
             matched_controller_ids.add(record_id)
+            reconcilable = check_discrepancies(cursor, controller_record)
 
-            cloud_dt = datetime.fromisoformat(cloud_record["updated_at"])
-            controller_dt = datetime.fromisoformat(controller_record["updated_at"])
+            if reconcilable:
+                cloud_dt = datetime.fromisoformat(cloud_record["updated_at"])
+                controller_dt = datetime.fromisoformat(controller_record["updated_at"])
+                
+                winning_record = (
+                    normalize_record(cloud_record, active_cloud_data, "cloud") 
+                    if cloud_dt >= controller_dt
+                    else controller_record
+                )
 
-            winning_record = (
-                cloud_record 
-                if cloud_dt >= controller_dt
-                else controller_record
-            )
-            
-            cursor.execute(
-                """
-                INSERT OR REPLACE INTO reconciled_unloads 
-                (id, field_id, truck_id, crop, weight_kg, unloaded_at, updated_at, resolution_notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    winning_record["id"],
-                    winning_record["field_id"],
-                    winning_record["truck_id"],
-                    winning_record["crop"],
-                    winning_record["weight_kg"],
-                    winning_record["unloaded_at"],
-                    winning_record["updated_at"],
-                    None  # resolution_notes can be None for normal successful syncs
-                )
-            )
-        else:
-            # Record exists in Cloud, but missing from Controller (Valid Master record)
-            cursor.execute(
-                """
-                INSERT OR REPLACE INTO reconciled_unloads 
-                (id, field_id, truck_id, crop, weight_kg, unloaded_at, updated_at, resolution_notes)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    cloud_record["id"],
-                    cloud_record["field_id"],
-                    cloud_record["truck_id"],
-                    cloud_record["crop"],
-                    cloud_record["weight_kg"],
-                    cloud_record["unloaded_at"],
-                    cloud_record["updated_at"],
-                    None
-                )
-            )    
+                store_reconciled_record(cursor, winning_record) 
 
     for controller_id, controller_record in controller_dictionary.items():
         if controller_id not in matched_controller_ids:
-            cursor.execute(
-                """
-                INSERT OR REPLACE INTO unresolved_unloads 
-                (unload_id, source, raw_payload, reason)
-                VALUES (?, ?, ?, ?)
-                """,
-                (
-                    controller_record["id"],
-                    "controller",
-                    json.dumps(controller_record),
-                    "Record exists on controller but missing from Cloud master"
-                )
-            )
+            if controller_id in trashed_cloud_record_ids:
+                store_dropped_record(cursor, controller_record, "Trashed By Cloud")
+            else:
+                reconcilable = check_discrepancies(cursor, controller_record)
+                if reconcilable:
+                    store_reconciled_record(cursor, controller_record)
 
     conn.commit()
     conn.close()
@@ -236,6 +303,7 @@ def load_reference_data():
     with open("data/fields.json", "r") as f:
         fields = json.load(f)
         for field in fields:
+            field_ids.add(field["id"])
             cursor.execute(
                 """
                 INSERT OR REPLACE INTO fields (id, name, area_ha, crop)
@@ -248,6 +316,7 @@ def load_reference_data():
     with open("data/trucks.json", "r") as f:
         trucks = json.load(f)
         for truck in trucks:
+            truck_ids.add(truck["id"])
             cursor.execute(
                 """
                 INSERT OR REPLACE INTO trucks (id, name, capacity_kg)

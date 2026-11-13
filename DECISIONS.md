@@ -8,9 +8,23 @@
 
 3. **Time:** Looking at a few examples, I can see the `unloaded_at` stamps are consistently 1 hour apart, with the cloud being ahead. Arguably, this was a total oversight on my end. I verified that each `field_id` had at least one load record that was exactly 1 hour behind its cloud counterpart, which confirmed all fields of interest are in the same time zone. Incidentally, I found that the first 3 `field_id` entries in `fields.json` were not found in the `controller_unloads` at all (this info will help me later I'm sure). I have changed the controllers to be assigned `-06:00` as the time zone, so now the times of controllers and cloud should agree. Then I used `datetime.fromisoformat` to compare the `updated_at` times, and the record with the more recent update wins.
 
-4. **50kg tolerance:** I can see that a 'weight discrepancy' can actually be attributed to a valid edit, because (perhaps) some product was manually added to the unload instead of through the truck/sensor, and the farmer uses their mobile app (or something similar) to manually correct it. At this point in time I will tentatively assume that all relevant unloads come from fields in the same `-06:00` time-zone (I recognize this assumption may be unideal), and all `unloaded_at` for matched cloud and controller records will agree. With that assumption, every `updated_at` timestamp will be a perfectly valid way to decide on a winner for the reconciled record.
+4. **50kg tolerance:** I can see that a 'weight discrepancy' can actually be attributed to a valid edit, because (perhaps) some product was manually added to the unload instead of through the truck/sensor, and the farmer uses their mobile app (or something similar) to manually correct it. At this point in time I will tentatively assume that all relevant unloads come from fields in the same `-06:00` time-zone, and all `unloaded_at` for matched cloud and controller records will agree (I recognize this assumption may be unideal). With that assumption, every `updated_at` timestamp will be a perfectly valid way to decide on a winner for the reconciled record.
 
-* **AT THIS POINT (second commit):** There are now only 12 records marked as unresolved, and there are 42 records marked as resolved by my output. The total weight is around `502650.4 kg`.
+**AT THIS POINT (second commit):** There are now only 12 records marked as unresolved, and there are 42 records marked as resolved by my output. The total weight is roughly `502650.4 kg`.
+
+5. **Missing from master oversimplification:** Based on your suggestion I thought of 4 reasons, 3 of which are simple.
+
+    **a.** trashed cloud records cause orphaned controller records to go in this bin
+
+    **b.** Field ID 'discrepancies' are another reason these orphans end up here, where the controller mentiones a field ID not seen in `fields.json`.
+
+    **c.** It's a valid unload and the cloud just didn't catch up yet
+
+    The final reason was very sneaky: controller double unload (same `unloaded_at`, `field_id`, and `truck_id` but with 2 different unload IDs).
+
+    I implemented logic to catch and display all of these.
+
+**AT THIS POINT (Third commit):** There are now only 7 records marked as unresolved, and there are 43 records marked as resolved by my output. The total weight is roughly `520203.0 kg`. I believe I can reach 45 reconciled unloads and ~550000 kg for the following reason: in suggestion 6, you called attention to my autopopulation of `fields.json`. For the same reason I should not blindly pre-load `fields.json` into my database, I think I can make the claim that this mystery field from the controller does exist somewhere, but just doesn't happen to be in my `fields.json`. I think I should trust the data and insert these mystery fields into the fields table with their respective IDs and crops, but I'll set `name` and `area_ha` both equal to `"unknown"`.
 
 ## What I built
 

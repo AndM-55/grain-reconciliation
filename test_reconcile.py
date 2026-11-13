@@ -1,6 +1,6 @@
 import sqlite3
-import pytest 
-from main import normalize_controller_record, process_unloads  
+import pytest
+from main import normalize_controller_record, process_unloads
 
 @pytest.fixture
 def test_db():
@@ -48,12 +48,22 @@ def test_normalize_controller_record():
         "unloaded_at": "2026-10-15 10:00:00",
         "updated_at": "2026-10-15 10:30:00"
     }
-    normalized = normalize_controller_record(raw)
+    # FIX THIS BEFORE TESTING
+    active = [{
+        "id": "test-id",
+        "field_id": "field-A",
+        "truck_id": "truck-1",
+        "crop": "wheat",
+        "weight": 4500.0,
+        "unloaded_at": "2026-10-15 10:00:00",
+        "updated_at": "2026-10-15 10:30:00"
+    }]
+    normalized = normalize_controller_record(raw, active)
     
     assert normalized["id"] == "test-id"
     assert normalized["weight_kg"] == 4500.0
     assert "T" in normalized["unloaded_at"] 
-    assert "-05:00" in normalized["unloaded_at"]
+    assert "-06:00" in normalized["unloaded_at"]
 
 def test_weight_discrepancy_routing(test_db, monkeypatch):
     """Test that records exceeding the weight tolerance are routed to unresolved_unloads."""
