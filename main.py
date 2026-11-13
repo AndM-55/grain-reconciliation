@@ -8,11 +8,14 @@ SCHEMA_PATH = Path("schema.sql")
 LB_TO_KG = 0.4536
 truck_ids = set()
 field_ids = set()
+new_field_count = 0
 
 # unload_id 1dccaaf4-fe5d-486c-be70-e2e0050c7be1 and 361111e6-8ab4-466b-b91c-ea32e272f588 are tricky here
 # maybe even add 3ac2ff60-5686-4564-a28c-dd2d1d59d793 to the list?
 
 # WEIGHT_TOLERANCE_KG = 50.0
+
+###################################################################
 
 def print_reconciliation_report():
     """Queries the SQLite database and prints the required reconciliation report to the console."""
@@ -29,21 +32,27 @@ def print_reconciliation_report():
 
     # --- PART 1: Field-by-Field Breakdown ---
     print(f"\n[1] RECONCILED UNLOADS BY FIELD ({resolved_count} total records)")
-    print(f"{'Field ID':<38} | {'Crop':<10} | {'Unloads':<8} | {'Total Weight (kg)':<18}")
+    print(f"{'Field name':<20} | {'Crop':<10} | {'Unloads':<8} | {'Total Weight (kg)':<18}")
     print("-" * 80)
 
     cursor.execute(
         """
-        SELECT field_id, crop, COUNT(*) as unload_count, SUM(weight_kg) as total_weight
-        FROM reconciled_unloads
-        GROUP BY field_id, crop
+        SELECT 
+            r.field_id, 
+            f.name AS field_name, 
+            r.crop, 
+            COUNT(*) as unload_count, 
+            SUM(r.weight_kg) as total_weight
+        FROM reconciled_unloads r
+        LEFT JOIN fields f ON r.field_id = f.id
+        GROUP BY r.field_id, f.name, r.crop
         ORDER BY total_weight DESC
         """
     )
     reconciled_rows = cursor.fetchall()
     if reconciled_rows:
         for row in reconciled_rows:
-            print(f"{row['field_id']} | {row['crop']:<10} | {row['unload_count']:<8} | {row['total_weight']:<18.2f}")
+            print(f"{row['field_name']:<20} | {row['crop']:<10} | {row['unload_count']:<8} | {row['total_weight']:<18.2f}")
     else:
         print("  No successfully reconciled records found.")
 
@@ -60,7 +69,7 @@ def print_reconciliation_report():
     if unresolved_rows:
         for row in unresolved_rows:
             ref_id = row['unload_id'] if row['unload_id'] else "N/A (Orphan)"
-            print(f"{ref_id:<38} | {row['source']:<10} | {row['reason']}")
+            print(f"{ref_id:<38} | {row['source']:<12} | {row['reason']}")
     else:
         print("  None. All records resolved cleanly!")
 
@@ -150,7 +159,7 @@ def store_reconciled_record(cursor: sqlite3.Cursor, record):
     )
 ###################################################################
 
-def store_dropped_record(cursor: sqlite3.Cursor, record, reason):
+def store_dropped_record(cursor: sqlite3.Cursor, record, reason, source):
     cursor.execute(
         """
                 INSERT OR REPLACE INTO unresolved_unloads 
@@ -159,22 +168,33 @@ def store_dropped_record(cursor: sqlite3.Cursor, record, reason):
                 """,
         (
             record["id"],
-            "controller",
+            source,
             json.dumps(record),
             reason
         )
     )
-    
+
+###################################################################
+
+def new_field(cursor: sqlite3.Cursor, record):
+    cursor.execute(
+        """
+                INSERT OR REPLACE INTO fields (id, name, area_ha, crop)
+                VALUES (?, ?, ?, ?)
+                """,
+        (record["field_id"], f"New Field {new_field_count}", -1.0, record["crop"])
+    )
 
 ###################################################################
 
 def check_discrepancies(cursor: sqlite3.Cursor, controller_record):
-    if controller_record["field_id"] not in field_ids:
-        store_dropped_record(cursor, controller_record, "Field ID discrepancy")
+    
+    if controller_record["truck_id"] not in truck_ids:
+        store_dropped_record(cursor, controller_record, "Truck ID discrepancy", "Controller")
         return False
-    elif controller_record["truck_id"] not in truck_ids:
-        store_dropped_record(cursor, controller_record, "Truck ID discrepancy")
-        return False
+    elif controller_record["field_id"] not in field_ids:
+        new_field(cursor, controller_record)
+        return True
     else:
         # Query the database to check if a reconciled unload with the exact 
         # same field, truck, and timestamp already exists.
@@ -195,7 +215,7 @@ def check_discrepancies(cursor: sqlite3.Cursor, controller_record):
         existing_match = cursor.fetchone()
         
         if existing_match:
-            store_dropped_record(cursor, controller_record, "Duplicate unload discrepancy")
+            store_dropped_record(cursor, controller_record, "Duplicate unload discrepancy", "Controller")
             return False
             
     return True
@@ -203,14 +223,20 @@ def check_discrepancies(cursor: sqlite3.Cursor, controller_record):
 
 ###################################################################
 
-def process_unloads():
+def process_unloads(db_path_or_conn=None):
     """Loads cloud and controller unloads and runs reconciliation."""
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
+    if db_path_or_conn is None:
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM reconciled_unloads")
+        cursor.execute("DELETE FROM unresolved_unloads") 
+    elif isinstance(db_path_or_conn, sqlite3.Connection):
+        conn = db_path_or_conn
+    else:
+        conn = sqlite3.connect(db_path_or_conn)
     cursor = conn.cursor()
 
-    cursor.execute("DELETE FROM reconciled_unloads")
-    cursor.execute("DELETE FROM unresolved_unloads")
+    conn.row_factory = sqlite3.Row  # Allows accessing columns by name
     conn.commit()
 
     with open("data/cloud_unloads.json", "r") as f:
@@ -227,10 +253,12 @@ def process_unloads():
         if record.get("trashed_at") is None
     ]
 
-    trashed_cloud_record_ids = [
-        record["id"] for record in cloud_data
-        if record.get("trashed_at") is not None
-    ]
+    trashed_cloud_record_ids = set()
+
+    for record in cloud_data:
+        if record.get("trashed_at") is not None:
+            trashed_cloud_record_ids.add(record["id"])
+            store_dropped_record(cursor, record, "Trashed", "Cloud")
 
     deleted_cloud_data = [
         record for record in cloud_data
@@ -247,58 +275,80 @@ def process_unloads():
     matched_controller_ids = set()
 
     # Iterate through active cloud records to match and reconcile
-    for cloud_record in active_cloud_data:
-        record_id = cloud_record["id"]
-        controller_record = controller_dictionary.get(record_id)
+    if len(active_cloud_data) > 0:
 
-        if controller_record:
-            matched_controller_ids.add(record_id)
-            reconcilable = check_discrepancies(cursor, controller_record)
+        for cloud_record in active_cloud_data:
+            record_id = cloud_record.get("id")
+            controller_record = controller_dictionary.get(record_id)
 
-            if reconcilable:
-                cloud_dt = datetime.fromisoformat(cloud_record["updated_at"])
-                controller_dt = datetime.fromisoformat(controller_record["updated_at"])
-                
-                winning_record = (
-                    normalize_record(cloud_record, active_cloud_data, "cloud") 
-                    if cloud_dt >= controller_dt
-                    else controller_record
-                )
-
-                store_reconciled_record(cursor, winning_record) 
-
-    for controller_id, controller_record in controller_dictionary.items():
-        if controller_id not in matched_controller_ids:
-            if controller_id in trashed_cloud_record_ids:
-                store_dropped_record(cursor, controller_record, "Trashed By Cloud")
-            else:
+            if controller_record:
+                matched_controller_ids.add(record_id)
                 reconcilable = check_discrepancies(cursor, controller_record)
+
                 if reconcilable:
-                    store_reconciled_record(cursor, controller_record)
+                    cloud_dt = datetime.fromisoformat(cloud_record["updated_at"])
+                    controller_dt = datetime.fromisoformat(controller_record["updated_at"])
+                    
+                    winning_record = (
+                        normalize_record(cloud_record, active_cloud_data, "cloud") 
+                        if cloud_dt >= controller_dt
+                        else controller_record
+                    )
+
+                    store_reconciled_record(cursor, winning_record) 
+
+    if len(controller_dictionary) > 0:
+        for controller_id, controller_record in controller_dictionary.items():
+            if controller_id not in matched_controller_ids:
+                if controller_id in trashed_cloud_record_ids:
+                    store_dropped_record(cursor, controller_record, "Trashed By Cloud master", "Controller")
+                else:
+                    reconcilable = check_discrepancies(cursor, controller_record)
+                    if reconcilable:
+                        store_reconciled_record(cursor, controller_record)
 
     conn.commit()
-    conn.close()
 
 
 ###################################################################
 
-def init_db():
+def init_db(db_path_or_conn=None):
     """Automatically initializing the SQLite database using schema.sql."""
-    conn = sqlite3.connect(DB_PATH)
+    is_external_conn = isinstance(db_path_or_conn, sqlite3.Connection)
+    
+    if db_path_or_conn is None:
+        conn = sqlite3.connect(DB_PATH)
+    elif is_external_conn:
+        conn = db_path_or_conn
+    else:
+        conn = sqlite3.connect(db_path_or_conn)
+        
     with open(SCHEMA_PATH, "r") as f:
         conn.executescript(f.read())
+        
     conn.commit()
-    conn.close()
+    
+    # Only close if we opened the connection locally
+    if not is_external_conn and db_path_or_conn is not None:
+        conn.close()
+    elif db_path_or_conn is None:
+        conn.close()
+        
     print("Database initialized successfully from schema.sql")
 
 
 ###################################################################
 # this function will load the reference data for trucks and fields into the databases
-def load_reference_data():
+def load_reference_data(db_path_or_conn=None):
     """Loads fields and trucks"""
-    conn = sqlite3.connect(DB_PATH)
+    if db_path_or_conn is None:
+        conn = sqlite3.connect(DB_PATH)
+    elif isinstance(db_path_or_conn, sqlite3.Connection):
+        conn = db_path_or_conn
+    else:
+        conn = sqlite3.connect(db_path_or_conn)
     cursor = conn.cursor()
-
+    
     # Load fields.json
     with open("data/fields.json", "r") as f:
         fields = json.load(f)
@@ -326,7 +376,6 @@ def load_reference_data():
             )
 
     conn.commit()
-    conn.close()
     print("Reference data (fields and trucks) loaded successfully!")
 
 ###################################################################

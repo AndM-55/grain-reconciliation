@@ -4,8 +4,9 @@
 
 I developed this program in VScode using WSL (Windows subsystem for Linux) Ubuntu terminal, and I gave docker a go too.
 
-clone from my public repository like so. \
-`git clone https://github.com/AndM-55/grain-reconciliation`
+clone from my public repository \
+`git clone https://github.com/AndM-55/grain-reconciliation`\
+or pull changes
 
 to reconcile the data and populate the database, I ran the command: \
 `docker-compose up --build`
